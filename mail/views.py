@@ -7,14 +7,16 @@ from django.shortcuts import HttpResponse, HttpResponseRedirect, render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import User, Email
+from .models import User, Email, Logo
 
 
 def index(request):
-
+    l = Logo.objects.filter(name="logo").first()
     # Authenticated users view their inbox
     if request.user.is_authenticated:
-        return render(request, "mail/inbox.html")
+        return render(request, "mail/inbox.html",{
+            "logo": l.logo
+        })
 
     # Everyone else is prompted to sign in
     else:
@@ -128,6 +130,7 @@ def email(request, email_id):
 
 
 def login_view(request):
+    l = Logo.objects.filter(name="logo").first()
     if request.method == "POST":
 
         # Attempt to sign user in
@@ -144,7 +147,9 @@ def login_view(request):
                 "message": "Invalid email and/or password."
             })
     else:
-        return render(request, "mail/login.html")
+        return render(request, "mail/login.html",{
+            "logo": l.logo
+        })
 
 
 def logout_view(request):
@@ -153,6 +158,7 @@ def logout_view(request):
 
 
 def register(request):
+    l = Logo.objects.filter(name="logo").first()
     if request.method == "POST":
         email = request.POST["email"]
 
@@ -161,7 +167,8 @@ def register(request):
         confirmation = request.POST["confirmation"]
         if password != confirmation:
             return render(request, "mail/register.html", {
-                "message": "Passwords must match."
+                "message": "Passwords must match.",
+                "logo": l.logo
             })
 
         # Attempt to create new user
@@ -176,4 +183,6 @@ def register(request):
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:
-        return render(request, "mail/register.html")
+        return render(request, "mail/register.html",{
+            "logo": l.logo
+        })

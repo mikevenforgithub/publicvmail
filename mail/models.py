@@ -27,3 +27,11 @@ class Email(models.Model):
             "read": self.read,
             "archived": self.archived
         }
+
+class Logo(models.Model):
+    name = models.CharField(max_length=150)
+    logo = models.FileField()
+
+    def __str__(self):
+        return f"{self.name}"
+

@@ -261,3 +261,98 @@ function load_email() {
       mail_view.appendChild(reply);
     });
 }
+
+
+
+function search() {
+
+  // SHOWING ONLY WHAT WE WANT TO SEE
+  var email_view = document.querySelector('#emails-view');
+  var compose_view = document.querySelector('#compose-view');
+
+  email_view.style.display = "none";
+  compose_view.style.display = "none";
+  
+  email_view.style.display = "block";
+  compose_view.style.display = "none";
+
+  email_view.innerHTML = '';
+  email_view.innerHTML = `Search Result`;
+
+  var searchbar = document.getElementById("searchb");
+  var input = searchbar.value;
+
+  //GET REQUEST
+  fetch(`/emails/inbox`)
+    .then(response => response.json())
+    .then(emails => {
+
+      if (emails.length == 0) {
+        email_view.innerHTML = '<p style = "font-size: large; font-weight: bold;">This Mailbox is Empty</p>';
+      }
+      else {
+        for (email in emails) {
+
+          if (emails[email]["body"].includes(input)){
+
+          //SETTING VIEW PARAMETERS
+          var mail = document.createElement("div");
+          var sender = document.createElement('h3');
+          var sub = document.createElement('p');
+          var time = document.createElement('p');
+          var id = document.createElement('p');
+
+          id.innerHTML = emails[email]['id'];
+          id.style.display = 'none';
+
+          sender.innerHTML = emails[email]['sender'];
+          if (emails[email]['subject'] == '') {
+            sub.innerHTML = 'No Subject';
+            sub.style.color = 'red';
+          }
+          else {
+            sub.innerHTML = emails[email]['subject'];
+          }
+
+          time.innerHTML = emails[email]['timestamp'];
+          mail.style.borderStyle = 'solid';
+          mail.style.borderColor = 'black';
+          mail.style.borderWidth = '1px';
+          mail.style.marginBottom = '10px';
+
+          if (emails[email]['read'] == true) {
+            mail.style.backgroundColor = 'gray';
+          }
+          else {
+            mail.style.backgroundColor = 'white';
+          }
+          
+          mail.classList.add('container');
+          mail.classList.add('mail');
+          //STYLE
+          sender.style.display = 'inline-block';
+          sender.style.margin = '5px';
+          sub.style.display = 'inline-block';
+          sub.style.margin = '10px';
+          time.style.display = 'inline-block';
+          time.style.margin = '10px';
+          time.style.float = 'right';
+          time.style.color = 'blue';
+          //INSERTING
+          email_view.appendChild(mail);
+          mail.appendChild(sender);
+          mail.appendChild(sub);
+          mail.appendChild(time);
+          mail.appendChild(id);
+
+          //CLICK ON EMAIL
+          mail.addEventListener('click', () => load_email());
+          sub.addEventListener('click', () => load_email());
+          time.addEventListener('click', () => load_email());
+          sender.addEventListener('click', () => load_email());
+        }
+        }
+      }
+    }
+    );
+}
